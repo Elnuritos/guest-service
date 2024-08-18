@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www
+    ports:
+      - "9000:9000"
+    networks:
+      - app-network
+    container_name: guest-service-app
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: guest_service
+      MYSQL_ROOT_PASSWORD: secret
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - app-network
+    container_name: guest-service-db
+
+  redis:
+    image: redis:alpine
+    networks:
+      - app-network
+    container_name: guest-service-redis
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:
