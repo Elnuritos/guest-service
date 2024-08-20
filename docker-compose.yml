@@ -8,10 +8,11 @@ services:
     volumes:
       - .:/var/www
     ports:
-      - "9000:9000"
+      - "8000:8000"
     networks:
       - app-network
     container_name: guest-service-app
+    command: sh -c "sleep 10 && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"
 
   db:
     image: mysql:8.0

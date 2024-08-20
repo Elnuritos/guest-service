@@ -1,66 +1,121 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Guest API Service
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Описание
+Этот проект представляет собой API для управления гостями. Он включает CRUD операции, а также интеграцию с OpenAPI (Swagger) для документирования API и тесты.
 
-## About Laravel
+## Технологии
+- PHP 8.x
+- Laravel 9.x
+- Docker
+- MySQL
+- Swagger (OpenAPI)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Установка и настройка
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 1. Клонирование репозитория
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```bash
+git clone <ссылка на репозиторий>
+cd guest-service
+```
 
-## Learning Laravel
+### 2. Копирование `.env` файла
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Создайте `.env` файл на основе `.env.example`:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+cp .env.example .env
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 3. Запуск Docker контейнеров
 
-## Laravel Sponsors
+Запустите Docker контейнеры с использованием `docker-compose`:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+```bash
+docker-compose up -d
+```
 
-### Premium Partners
+Это создаст контейнеры для приложения, базы данных и других необходимых сервисов.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+### 4. Установка зависимостей
 
-## Contributing
+Выполните следующую команду для установки зависимостей PHP внутри контейнера:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+docker-compose exec app composer install
+```
 
-## Code of Conduct
+### 5. Генерация ключа приложения
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Сгенерируйте ключ приложения Laravel:
 
-## Security Vulnerabilities
+```bash
+docker-compose exec app php artisan key:generate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 6. Запуск миграций и сидов
 
-## License
+Запустите миграции для создания таблиц базы данных:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+docker-compose exec app php artisan migrate
+```
+
+Если вам нужны начальные данные, вы можете использовать сиды:
+
+```bash
+docker-compose exec app php artisan db:seed --class=GuestSeeder
+```
+
+### 7. Генерация Swagger документации
+
+Чтобы сгенерировать документацию для API, выполните следующую команду:
+
+```bash
+docker-compose exec app php artisan l5-swagger:generate
+```
+
+### 8. Доступ к API документации
+
+После генерации документации Swagger, она будет доступна по адресу:
+
+```
+http://localhost:8000/docs
+http://localhost:8000/api/documentation
+```
+
+### 9. Запуск тестов
+
+Чтобы убедиться, что всё работает правильно, запустите тесты:
+
+```bash
+docker-compose exec app php artisan test
+```
+
+### 10. Использование API
+
+- **Список гостей**: `GET /api/v1/guests`
+- **Создание гостя**: `POST /api/v1/guests`
+- **Получение информации о госте**: `GET /api/v1/guests/{id}`
+- **Обновление данных гостя**: `PUT /api/v1/guests/{id}`
+- **Удаление гостя**: `DELETE /api/v1/guests/{id}`
+- **Во всех запросах есть  x-debug-memory и x-debug-time**
+
+
+
+### 12. Остановка контейнеров
+
+Для остановки и удаления всех контейнеров используйте:
+
+```bash
+docker-compose down
+```
+
+## Примечания
+- Убедитесь, что у вас установлен Docker и Docker Compose.
+- При необходимости, настройте переменные в `.env` файле, такие как доступ к базе данных и другие конфигурации.
+- Если у вас возникают ошибки с подключением к базе данных, убедитесь, что контейнеры с базой данных запущены.
+
+---
+
+Этот README должен покрыть все аспекты, которые мы рассматривали, и предоставить исчерпывающие шаги для запуска и использования проекта. Если что-то еще нужно добавить или уточнить, дайте мне знать!
